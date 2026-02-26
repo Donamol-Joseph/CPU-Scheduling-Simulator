@@ -93,43 +93,6 @@ The application is implemented as a single-page frontend system without backend 
 
 ---
 
-## File Structure Explanation
-
-### index.html
-
-The root HTML file that loads the React application and provides the mounting point for the virtual DOM.
-
-### package.json
-
-Contains project metadata, dependencies, and scripts used for development and build processes.
-
-### tsconfig.json
-
-Defines TypeScript compiler configuration, ensuring strict typing and project consistency.
-
-### vite.config.ts
-
-Configuration file for Vite, managing development server behavior and build optimization.
-
-### src/main.tsx
-
-Application entry point. It renders the root React component into the DOM.
-
-### src/App.tsx
-
-Core application component containing:
-
-* Process input handling
-* Scheduling algorithm logic
-* Simulation execution
-* Gantt chart rendering
-* Metric calculations
-
-### src/index.css
-
-Global styling file responsible for layout structure, visual consistency, and responsive design.
-
----
 
 ## Installation
 
