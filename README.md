@@ -4,23 +4,6 @@
 
 ---
 
-## Table of Contents
-
-* Overview
-* Features
-* Scheduling Algorithms
-* Calculation Logic
-* Technology Stack
-* Project Structure
-* File Structure Explanation
-* Installation
-* Usage
-* Educational Objective
-* Future Enhancements
-* Live Demo
-
----
-
 ## Overview
 
 This project is a frontend-based CPU Scheduling Simulator developed to demonstrate core operating system scheduling concepts through interactive visualization. Users can enter process details, select a scheduling algorithm, and simulate execution while observing computed performance metrics and graphical timelines.
