@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPU Scheduling Simulator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        header h1 {
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        header p {
+            color: #7f8c8d;
+            margin-top: 0;
+        }
+        .card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        .card h2 {
+            margin-top: 0;
+            color: #2980b9;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .input-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        input[type="text"], input[type="number"] {
+            flex: 1;
+            min-width: 150px;
+            padding: 12px;
+            border: 1px solid #bdc3c7;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        button {
+            padding: 12px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+        .delete-btn {
+            background-color: #e74c3c;
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+        .delete-btn:hover {
+            background-color: #c0392b;
+        }
+        .simulate-btn {
+            background-color: #2ecc71;
+            width: 100%;
+            font-size: 16px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .simulate-btn:hover {
+            background-color: #27ae60;
+        }
+        .error {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 10px;
+            min-height: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ecf0f1;
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #f9fbfc;
+            color: #34495e;
+            font-weight: 600;
+        }
+        .settings {
+            margin-top: 25px;
+            background: #f9fbfc;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #ecf0f1;
+        }
+        .settings h3 {
+            margin-top: 0;
+            font-size: 16px;
+            color: #2c3e50;
+        }
+        .settings label {
+            margin-right: 20px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+        .gantt-chart {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            overflow-x: auto;
+            border-radius: 6px;
+        }
+        .gantt-block {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 60px;
+            color: #fff;
+            font-weight: bold;
+            position: relative;
+            border-right: 1px solid rgba(255,255,255,0.3);
+            box-sizing: border-box;
+            min-width: 50px;
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .gantt-block:first-child {
+            border-top-left-radius: 6px;
+            border-bottom-left-radius: 6px;
+        }
+        .gantt-block:last-child {
+            border-top-right-radius: 6px;
+            border-bottom-right-radius: 6px;
+            border-right: none;
+        }
+        .gantt-time {
+            position: absolute;
+            bottom: -25px;
+            color: #7f8c8d;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .start-time {
+            left: 0;
+            transform: translateX(-50%);
+        }
+        .end-time {
+            right: 0;
+            transform: translateX(50%);
+        }
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        .steps-container {
+            background: #fdfefe;
+            border-left: 4px solid #3498db;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 6px 6px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+        .steps-container h3 {
+            margin-top: 0;
+            color: #2980b9;
+            font-size: 16px;
+        }
+        .steps-container ul {
+            margin: 0;
+            padding-left: 20px;
+            color: #34495e;
+        }
+        .steps-container li {
+            margin-bottom: 8px;
+        }
+        .averages {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 25px;
+            background: #f9fbfc;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #ecf0f1;
+        }
+        .averages p {
+            margin: 0;
+            font-size: 16px;
+            color: #2c3e50;
+        }
+        .averages span {
+            font-weight: bold;
+            color: #2980b9;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>CPU Scheduling Simulator</h1>
+            <p>Simulate FCFS and SJF (Non-Preemptive) algorithms.</p>
+        </header>
+
+        <div class="card">
+            <h2>1. Add Process</h2>
+            <div class="input-group">
+                <input type="text" id="pid" placeholder="Process ID (e.g., P1)">
+                <input type="number" id="at" placeholder="Arrival Time" min="0">
+                <input type="number" id="bt" placeholder="Burst Time" min="1">
+                <button onclick="addProcess()">Add Process</button>
+            </div>
+            <div id="error-msg" class="error"></div>
+        </div>
+
+        <div class="card">
+            <h2>2. Process List & Settings</h2>
+            <table id="process-table">
+                <thead>
+                    <tr>
+                        <th>Process ID</th>
+                        <th>Arrival Time</th>
+                        <th>Burst Time</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Processes will be added here -->
+                </tbody>
+            </table>
+
+            <div class="settings">
+                <h3>Select Algorithm:</h3>
+                <label><input type="radio" name="algorithm" value="FCFS" checked> FCFS (First Come First Serve)</label>
+                <label><input type="radio" name="algorithm" value="SJF"> SJF (Non-Preemptive)</label>
+            </div>
+            
+            <button class="simulate-btn" onclick="simulate()">Simulate</button>
+            <div id="sim-error-msg" class="error"></div>
+        </div>
+
+        <div id="output-section" class="card" style="display: none;">
+            <h2>3. Simulation Results</h2>
+            
+            <h3>Gantt Chart</h3>
+            <div id="gantt-chart" class="gantt-chart"></div>
+
+            <div id="steps-container" class="steps-container"></div>
+
+            <h3>Metrics</h3>
+            <table id="metrics-table">
+                <thead>
+                    <tr>
+                        <th>Process ID</th>
+                        <th>Arrival Time</th>
+                        <th>Burst Time</th>
+                        <th>Completion Time</th>
+                        <th>Turnaround Time</th>
+                        <th>Waiting Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Metrics will be added here -->
+                </tbody>
+            </table>
+
+            <div class="averages">
+                <p><strong>Average Turnaround Time:</strong> <span id="avg-tat">0</span></p>
+                <p><strong>Average Waiting Time:</strong> <span id="avg-wt">0</span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let processes = [];
+        const colors = ['#e74c3c', '#2ecc71', '#f1c40f', '#9b59b6', '#e67e22', '#1abc9c', '#3498db', '#34495e', '#d35400', '#c0392b'];
+
+        function addProcess() {
+            const pidInput = document.getElementById('pid');
+            const atInput = document.getElementById('at');
+            const btInput = document.getElementById('bt');
+            const errorMsg = document.getElementById('error-msg');
+
+            const pid = pidInput.value.trim();
+            const at = parseInt(atInput.value);
+            const bt = parseInt(btInput.value);
+
+            errorMsg.textContent = '';
+
+            if (!pid || isNaN(at) || isNaN(bt)) {
+                errorMsg.textContent = 'Please fill all fields with valid numbers.';
+                return;
+            }
+            if (at < 0 || bt <= 0) {
+                errorMsg.textContent = 'Arrival Time must be >= 0 and Burst Time must be > 0.';
+                return;
+            }
+            if (processes.some(p => p.pid === pid)) {
+                errorMsg.textContent = 'Process ID must be unique.';
+                return;
+            }
+
+            processes.push({ pid, at, bt, color: colors[processes.length % colors.length] });
+            
+            pidInput.value = '';
+            atInput.value = '';
+            btInput.value = '';
+            
+            renderTable();
+        }
+
+        function deleteProcess(pid) {
+            processes = processes.filter(p => p.pid !== pid);
+            renderTable();
+        }
+
+        function renderTable() {
+            const tbody = document.querySelector('#process-table tbody');
+            tbody.innerHTML = '';
+            processes.forEach(p => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${p.pid}</td>
+                    <td>${p.at}</td>
+                    <td>${p.bt}</td>
+                    <td><button class="delete-btn" onclick="deleteProcess('${p.pid}')">Delete</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function simulate() {
+            const errorMsg = document.getElementById('sim-error-msg');
+            errorMsg.textContent = '';
+
+            if (processes.length === 0) {
+                errorMsg.textContent = 'Please add at least one process to simulate.';
+                return;
+            }
+
+            const algo = document.querySelector('input[name="algorithm"]:checked').value;
+            let result;
+
+            if (algo === 'FCFS') {
+                result = runFCFS();
+            } else if (algo === 'SJF') {
+                result = runSJF();
+            }
+
+            renderOutput(result);
+        }
+
+        function runFCFS() {
+            let procs = [...processes].sort((a, b) => a.at - b.at);
+            let currentTime = 0;
+            let schedule = [];
+            let metrics = [];
+            let steps = [];
+
+            procs.forEach(p => {
+                if (currentTime < p.at) {
+                    schedule.push({ pid: 'IDLE', start: currentTime, end: p.at, color: '#bdc3c7' });
+                    steps.push(`CPU is IDLE from time ${currentTime} to ${p.at}.`);
+                    currentTime = p.at;
+                }
+                let start = currentTime;
+                let end = currentTime + p.bt;
+                schedule.push({ pid: p.pid, start, end, color: p.color });
+                steps.push(`Process ${p.pid} executes from time ${start} to ${end}.`);
+                
+                let ct = end;
+                let tat = ct - p.at;
+                let wt = start - p.at;
+                
+                metrics.push({ ...p, ct, tat, wt });
+                currentTime = end;
+            });
+
+            return { schedule, metrics, steps };
+        }
+
+        function runSJF() {
+            let procs = processes.map(p => ({ ...p, isCompleted: false }));
+            let currentTime = 0;
+            let completed = 0;
+            let n = procs.length;
+            let schedule = [];
+            let metrics = [];
+            let steps = [];
+
+            while (completed < n) {
+                let arrived = procs.filter(p => p.at <= currentTime && !p.isCompleted);
+                
+                if (arrived.length === 0) {
+                    let remaining = procs.filter(p => !p.isCompleted);
+                    let minAt = Math.min(...remaining.map(p => p.at));
+                    schedule.push({ pid: 'IDLE', start: currentTime, end: minAt, color: '#bdc3c7' });
+                    steps.push(`No processes arrived. CPU is IDLE from time ${currentTime} to ${minAt}.`);
+                    currentTime = minAt;
+                    continue;
+                }
+
+                arrived.sort((a, b) => {
+                    if (a.bt !== b.bt) return a.bt - b.bt;
+                    return a.at - b.at;
+                });
+
+                let selected = arrived[0];
+                let start = currentTime;
+                let end = currentTime + selected.bt;
+                
+                let arrivedPids = arrived.map(p => `${p.pid}(BT:${p.bt})`).join(', ');
+                steps.push(`At time ${currentTime}, arrived processes: [${arrivedPids}]. Selected ${selected.pid} (Shortest BT). Executes till ${end}.`);
+
+                schedule.push({ pid: selected.pid, start, end, color: selected.color });
+                
+                let ct = end;
+                let tat = ct - selected.at;
+                let wt = start - selected.at;
+                
+                metrics.push({ ...selected, ct, tat, wt });
+                
+                selected.isCompleted = true;
+                completed++;
+                currentTime = end;
+            }
+
+            metrics.sort((a, b) => a.pid.localeCompare(b.pid));
+
+            return { schedule, metrics, steps };
+        }
+
+        function renderOutput(result) {
+            document.getElementById('output-section').style.display = 'block';
+            
+            const ganttContainer = document.getElementById('gantt-chart');
+            ganttContainer.innerHTML = '';
+            
+            let totalTime = result.schedule[result.schedule.length - 1].end;
+            
+            result.schedule.forEach((block, index) => {
+                const div = document.createElement('div');
+                div.className = 'gantt-block';
+                div.style.backgroundColor = block.color;
+                
+                let widthPct = ((block.end - block.start) / totalTime) * 100;
+                div.style.flex = `1 1 ${widthPct}%`;
+                div.style.animationDelay = `${index * 0.1}s`;
+                
+                div.innerHTML = `
+                    ${block.pid}
+                    <div class="gantt-time start-time">${block.start}</div>
+                    ${index === result.schedule.length - 1 ? `<div class="gantt-time end-time">${block.end}</div>` : ''}
+                `;
+                
+                ganttContainer.appendChild(div);
+            });
+
+            const stepsContainer = document.getElementById('steps-container');
+            stepsContainer.innerHTML = '<h3>Simulation Steps:</h3><ul>' + result.steps.map(s => `<li>${s}</li>`).join('') + '</ul>';
+
+            const tbody = document.querySelector('#metrics-table tbody');
+            tbody.innerHTML = '';
+            
+            let totalWT = 0;
+            let totalTAT = 0;
+            
+            result.metrics.forEach(m => {
+                totalWT += m.wt;
+                totalTAT += m.tat;
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${m.pid}</td>
+                    <td>${m.at}</td>
+                    <td>${m.bt}</td>
+                    <td>${m.ct}</td>
+                    <td>${m.tat}</td>
+                    <td>${m.wt}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+            
+            let avgWT = (totalWT / result.metrics.length).toFixed(2);
+            let avgTAT = (totalTAT / result.metrics.length).toFixed(2);
+            
+            document.getElementById('avg-wt').textContent = avgWT;
+            document.getElementById('avg-tat').textContent = avgTAT;
+            
+            // Scroll to output
+            document.getElementById('output-section').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

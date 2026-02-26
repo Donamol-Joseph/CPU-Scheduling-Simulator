@@ -1,0 +1,5 @@
+{
+  "name": "CPU Scheduling Simulator",
+  "description": "A single-page web application to simulate CPU Scheduling Algorithms (FCFS and SJF Non-Preemptive).",
+  "requestFramePermissions": []
+}
